@@ -1,16 +1,17 @@
-package com.devocative.poi;
+package org.devocative.samples.poi;
 
-import java.io.FileOutputStream;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.*;
 import org.apache.poi.ss.usermodel.charts.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ScatterChart {
+import java.io.FileOutputStream;
+
+public class LineChart {
 
     public static void main(String[] args) throws Exception {
         Workbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet("Sheet 1");
+        Sheet sheet = wb.createSheet("linechart");
         final int NUM_OF_ROWS = 3;
         final int NUM_OF_COLUMNS = 10;
 
@@ -32,9 +33,10 @@ public class ScatterChart {
         ChartLegend legend = chart.getOrCreateLegend();
         legend.setPosition(LegendPosition.TOP_RIGHT);
 
-        ScatterChartData data = chart.getChartDataFactory().createScatterChartData();
+        LineChartData data = chart.getChartDataFactory().createLineChartData();
 
-        ValueAxis bottomAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.BOTTOM);
+        // Use a category axis for the bottom axis.
+        ChartAxis bottomAxis = chart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
         ValueAxis leftAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
         leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
 
@@ -43,13 +45,13 @@ public class ScatterChart {
         ChartDataSource<Number> ys2 = DataSources.fromNumericCellRange(sheet, new CellRangeAddress(2, 2, 0, NUM_OF_COLUMNS - 1));
 
 
-        data.addSerie(xs, ys1);
-        data.addSerie(xs, ys2);
+        data.addSeries(xs, ys1);
+        data.addSeries(xs, ys2);
 
         chart.plot(data, bottomAxis, leftAxis);
 
         // Write the output to a file
-        FileOutputStream fileOut = new FileOutputStream("ooxml-scatter-chart.xlsx");
+        FileOutputStream fileOut = new FileOutputStream("ooxml-line-chart.xlsx");
         wb.write(fileOut);
         fileOut.close();
     }

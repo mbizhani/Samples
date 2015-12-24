@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<beans>
+
+		<bean id="dConfig" class="org.devocative.samples.spring.bean.DConfig"/>
+
+		<bean id="dPersistor" class="org.devocative.samples.spring.bean.DPersistor">
+			<property name="key1" value="#{dConfig.getString('key1')}"/>
+			<property name="key2" value="#{dConfig.getString('key2')}"/>
+		</bean>
+
+	</beans>
+
+</beans>

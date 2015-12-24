@@ -1,31 +1,17 @@
-package com.devocative.poi;
+package org.devocative.samples.poi;
 
-import java.io.FileOutputStream;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Chart;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.charts.AxisCrosses;
-import org.apache.poi.ss.usermodel.charts.AxisPosition;
-import org.apache.poi.ss.usermodel.charts.ChartAxis;
-import org.apache.poi.ss.usermodel.charts.ChartDataSource;
-import org.apache.poi.ss.usermodel.charts.ChartLegend;
-import org.apache.poi.ss.usermodel.charts.DataSources;
-import org.apache.poi.ss.usermodel.charts.LegendPosition;
-import org.apache.poi.ss.usermodel.charts.LineChartData;
-import org.apache.poi.ss.usermodel.charts.ValueAxis;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.charts.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class LineChart {
+import java.io.FileOutputStream;
+
+public class ScatterChart {
 
     public static void main(String[] args) throws Exception {
         Workbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet("linechart");
+        Sheet sheet = wb.createSheet("Sheet 1");
         final int NUM_OF_ROWS = 3;
         final int NUM_OF_COLUMNS = 10;
 
@@ -47,10 +33,9 @@ public class LineChart {
         ChartLegend legend = chart.getOrCreateLegend();
         legend.setPosition(LegendPosition.TOP_RIGHT);
 
-        LineChartData data = chart.getChartDataFactory().createLineChartData();
+        ScatterChartData data = chart.getChartDataFactory().createScatterChartData();
 
-        // Use a category axis for the bottom axis.
-        ChartAxis bottomAxis = chart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
+        ValueAxis bottomAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.BOTTOM);
         ValueAxis leftAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
         leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
 
@@ -59,13 +44,13 @@ public class LineChart {
         ChartDataSource<Number> ys2 = DataSources.fromNumericCellRange(sheet, new CellRangeAddress(2, 2, 0, NUM_OF_COLUMNS - 1));
 
 
-        data.addSeries(xs, ys1);
-        data.addSeries(xs, ys2);
+        data.addSerie(xs, ys1);
+        data.addSerie(xs, ys2);
 
         chart.plot(data, bottomAxis, leftAxis);
 
         // Write the output to a file
-        FileOutputStream fileOut = new FileOutputStream("ooxml-line-chart.xlsx");
+        FileOutputStream fileOut = new FileOutputStream("ooxml-scatter-chart.xlsx");
         wb.write(fileOut);
         fileOut.close();
     }
