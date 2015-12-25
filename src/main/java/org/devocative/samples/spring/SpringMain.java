@@ -10,6 +10,6 @@ public class SpringMain {
 
 		DPersistor persistor = (DPersistor) appCtx.getBean("dPersistor");
 		persistor.print();
-
+		System.out.println("persistor.getClass() = " + persistor.getClass());
 	}
 }

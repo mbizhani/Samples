@@ -7,6 +7,8 @@ public class DConfig {
 	private Properties properties = new Properties();
 
 	public DConfig() {
+		System.out.println("DConfig Const!");
+
 		try {
 			properties.load(DConfig.class.getResourceAsStream("/config.properties"));
 		} catch (IOException e) {

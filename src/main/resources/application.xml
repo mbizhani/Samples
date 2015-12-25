@@ -7,12 +7,12 @@
 
 	<beans>
 
-		<bean id="dConfig" class="org.devocative.samples.spring.bean.DConfig"/>
-
 		<bean id="dPersistor" class="org.devocative.samples.spring.bean.DPersistor">
 			<property name="key1" value="#{dConfig.getString('key1')}"/>
 			<property name="key2" value="#{dConfig.getString('key2')}"/>
 		</bean>
+
+		<bean id="dConfig" class="org.devocative.samples.spring.bean.DConfig"/>
 
 	</beans>
 
