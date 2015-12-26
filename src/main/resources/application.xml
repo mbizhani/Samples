@@ -9,13 +9,33 @@
 
 	<beans>
 
-		<bean id="dPersistor" class="org.devocative.samples.spring.bean.DPersistor"
+		<bean name="dPersistor" class="org.devocative.samples.spring.bean.DPersistor"
 			  init-method="init" destroy-method="shutdown">
 			<property name="key1" value="#{dConfig.getString('key1')}"/>
 			<property name="key2" value="#{dConfig.getString('key2')}"/>
 		</bean>
 
-		<bean id="dConfig" class="org.devocative.samples.spring.bean.DConfig"/>
+		<bean name="dConfig" class="org.devocative.samples.spring.bean.DConfig"/>
+
+
+		<bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="#{dConfig.getString('db.driver')}"/>
+			<property name="url" value="#{dConfig.getString('db.url')}"/>
+			<property name="username" value="#{dConfig.getString('db.username')}"/>
+			<property name="password" value="#{dConfig.getString('db.password')}"/>
+		</bean>
+
+		<bean name="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+			<property name="dataSource" ref="dataSource"/>
+			<property name="packagesToScan" value="org.devocative.samples.jpa.entity"/>
+			<property name="persistenceProviderClass" value="org.hibernate.jpa.HibernatePersistenceProvider"/>
+			<property name="jpaPropertyMap">
+				<map>
+					<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+					<entry key="hibernate.hbm2ddl.auto" value="update"/>
+				</map>
+			</property>
+		</bean>
 
 	</beans>
 
