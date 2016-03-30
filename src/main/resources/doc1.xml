@@ -1,0 +1,10 @@
+<doc>
+	<part1 p1a="A" p1b="B"/>
+
+	<part2 p2y="Y"/>
+
+	<parts>
+		<part1 p1a="D"/>
+		<part1 p1a="F"/>
+	</parts>
+</doc>

@@ -19,6 +19,7 @@ public class JPAMain {
 
 
 		entityManager.close();
+		entityManagerFactory.close();
 	}
 
 	private static void query(EntityManager entityManager) {

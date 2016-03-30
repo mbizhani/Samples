@@ -24,12 +24,15 @@ public class FreeMarkerMain {
 
 				// (*) The space between "if" and "(" is mandatory!
 				// (*) The parentheses are required because of ">" operator
-				"<#if (i > 0)>" +
+				"<#if (i < 0)>\n" +
 
-				"One" +
-				"<#else>" +
-				"Oops!" +
-				"</#if>" +
+				"One\n" +
+
+				"--<#elseif (name??)>\n" +
+
+				"Oops!\n" +
+
+				"--</#if>\n" +
 				"|\n" +
 
 				"${pr.name} is ${pr.age} years old :)",
