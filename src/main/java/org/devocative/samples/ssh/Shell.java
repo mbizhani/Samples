@@ -1,78 +1,133 @@
 package org.devocative.samples.ssh;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.swing.*;
 
 public class Shell {
-	static JSch jsch = new JSch();
-	static Session session;
+	public static void main(String[] arg) {
 
-	public static void main(String[] args) throws JSchException, IOException {
-		createSession("root", "qazwsx@123", "172.16.1.243");
-//		exec("ls -l");
-		exec("df -f");
-//		exec("pwd");
-//		exec("mkdir test");
-//		exec("ll /asd");
-//		exec(session, "ps ax|grep httpd| grep -v grep");
-//		exec(session, "echo $PATH\nls -l\ndf -h\nps ax|grep httpd| grep -v grep");
-		//exec(session, "ping 172.16.1.200");
-		session.disconnect();
+		try {
+			JSch jsch = new JSch();
 
-//		session = createSession("root", "qazwsx@123", "172.16.4.3");
-//		exec(session, "vim-cmd vmsvc/getallvms");
-//		exec(session, "vim-cmd vmsvc/power.on 1");
-//		session.disconnect();
+			//jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
+
+			String host = null;
+			if (arg.length > 0) {
+				host = arg[0];
+			} else {
+				host = JOptionPane.showInputDialog("Enter username@hostname",
+					System.getProperty("user.name") +
+						"@localhost");
+			}
+			String user = host.substring(0, host.indexOf('@'));
+			host = host.substring(host.indexOf('@') + 1);
+
+			Session session = jsch.getSession(user, host, 22);
+
+			String passwd = JOptionPane.showInputDialog("Enter password");
+			session.setPassword(passwd);
+
+			UserInfo ui = new MyUserInfo() {
+				public void showMessage(String message) {
+					JOptionPane.showMessageDialog(null, message);
+				}
+
+				public boolean promptYesNo(String message) {
+					Object[] options = {"yes", "no"};
+					int foo = JOptionPane.showOptionDialog(null,
+						message,
+						"Warning",
+						JOptionPane.DEFAULT_OPTION,
+						JOptionPane.WARNING_MESSAGE,
+						null, options, options[0]);
+					return foo == 0;
+				}
+
+				// If password is not given before the invocation of Session#connect(),
+				// implement also following methods,
+				//   * UserInfo#getPassword(),
+				//   * UserInfo#promptPassword(String message) and
+				//   * UIKeyboardInteractive#promptKeyboardInteractive()
+
+			};
+
+			session.setUserInfo(ui);
+
+			// It must not be recommended, but if you want to skip host-key check,
+			// invoke following,
+			// session.setConfig("StrictHostKeyChecking", "no");
+
+			//session.connect();
+			session.connect(30000);   // making a connection with timeout.
+
+			Channel channel = session.openChannel("shell");
+
+			((ChannelShell) channel).setPtyType("xterm");
+
+			// Enable agent-forwarding.
+			//((ChannelShell)channel).setAgentForwarding(true);
+
+			channel.setInputStream(System.in);
+	  /*
+	  // a hack for MS-DOS prompt on Windows.
+      channel.setInputStream(new FilterInputStream(System.in){
+          public int read(byte[] b, int off, int len)throws IOException{
+            return in.read(b, off, (len>1024?1024:len));
+          }
+        });
+       */
+
+			channel.setOutputStream(System.out);
+
+      /*
+	  // Choose the pty-type "vt102".
+      ((ChannelShell)channel).setPtyType("vt102");
+      */
+
+      /*
+      // Set environment variable "LANG" as "ja_JP.eucJP".
+      ((ChannelShell)channel).setEnv("LANG", "ja_JP.eucJP");
+      */
+
+			//channel.connect();
+			channel.connect(3 * 1000);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 
-	static void createSession(String username, String password, String host) throws JSchException {
-		session = jsch.getSession(username, host, 22);
-		session.setPassword(password);
-
-		// It must not be recommended, but if you want to skip host-key check,
-		// invoke following,
-		session.setConfig("StrictHostKeyChecking", "no");
-
-		session.connect(30000); // making a connection with timeout.
-
-	}
-
-	static void exec(String cmd) throws JSchException, IOException {
-
-		ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-		channelExec.setCommand(cmd);
-		channelExec.setInputStream(null);
-		channelExec.setErrStream(System.err);
-
-		InputStream in = channelExec.getInputStream();
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-		channelExec.connect();
-
-		while (true) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
-			}
-			if (channelExec.isClosed()) {
-				System.out.println("--- exit-status: " + channelExec.getExitStatus());
-				break;
-			}
-			/*try {
-				Thread.sleep(1000);
-				System.out.println("--- sleep");
-			} catch (Exception ee) {
-				ee.printStackTrace();
-			}*/
+	public static abstract class MyUserInfo
+		implements UserInfo, UIKeyboardInteractive {
+		public String getPassword() {
+			return null;
 		}
 
-		channelExec.disconnect();
+		public boolean promptYesNo(String str) {
+			return false;
+		}
+
+		public String getPassphrase() {
+			return null;
+		}
+
+		public boolean promptPassphrase(String message) {
+			return false;
+		}
+
+		public boolean promptPassword(String message) {
+			return false;
+		}
+
+		public void showMessage(String message) {
+		}
+
+		public String[] promptKeyboardInteractive(String destination,
+												  String name,
+												  String instruction,
+												  String[] prompt,
+												  boolean[] echo) {
+			return null;
+		}
 	}
 }
