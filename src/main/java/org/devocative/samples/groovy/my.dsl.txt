@@ -1,0 +1,8 @@
+def res = execCl {
+	name 'test'
+	prompt 'ok'
+	params a:'a',b:'b'
+	plist 1, 2, 5
+}
+
+println res
