@@ -1,8 +1,27 @@
 def res = execCl {
 	name 'test'
-	prompt 'ok'
+	prompt "ok: ${a}"
 	params a:'a',b:'b'
 	plist 1, 2, 5
 }
 
+println "${res} , a = ${a}"
+
+res = exec("runt it ${a}",[q:1])
 println res
+
+res = exec "runt it ${a}", [q:1]
+println res
+
+res = exec "single ${a}"
+println res
+
+res = ssh "single ${a}", "ls", true
+println "ssh = $res"
+
+if(res > 1)
+	println "\tif is done"
+
+res = doIt "single ${a}"
+println res
+
