@@ -27,6 +27,8 @@ public class GScript {
 
 			Binding binding = new Binding();
 			binding.setVariable("a", i);
+			binding.setVariable("b", i + 2);
+			binding.setVariable("c", i * 12);
 
 			CompilerConfiguration cc = new CompilerConfiguration();
 			cc.setScriptBaseClass(DelegatingScript.class.getName());
@@ -72,7 +74,14 @@ public class GScript {
 			Closure rehydrate = cls.rehydrate(delegate, binding, null);
 			rehydrate.setResolveStrategy(Closure.DELEGATE_FIRST);
 			rehydrate.call();
-			return delegate.getClosureAsMap();
+			Map<String, Object> closureAsMap = delegate.getClosureAsMap();
+			System.out.println("closureAsMap = " + closureAsMap);
+			if (closureAsMap.containsKey("result")) {
+				Closure result = (Closure) closureAsMap.get("result");
+				return result.call(12);
+			} else {
+				return closureAsMap;
+			}
 
 			/*ExecDataHandler handler = new ExecDataHandler();
 			Closure<ExecDataHandler> rehydrate = cls.rehydrate(handler, binding, null);
@@ -83,6 +92,16 @@ public class GScript {
 
 		public Object ssh(CharSequence prompt, CharSequence cmd, Boolean force, CharSequence... stdin) {
 			return ((int) (Math.random() * 1000));
+		}
+
+		public Map<CharSequence, Object> inputs(CharSequence... params) {
+			Map<CharSequence, Object> result = new HashMap<>();
+			for (CharSequence param : params) {
+				if (binding.containsKey(param)) {
+					result.put(param, binding.get(param));
+				}
+			}
+			return result;
 		}
 	}
 
@@ -130,7 +149,7 @@ public class GScript {
 							finalArgs[i] = args[i];
 						}
 
-						if (varArgIdx > 0) {
+						if (varArgIdx >= 0) {
 							Parameter varArg = parameters[varArgIdx];
 							Object[] varArgParams;
 							if (args.length > varArgIdx) {

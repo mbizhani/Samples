@@ -1,8 +1,13 @@
+def map = inputs('a' ,'b')
+
 def res = execCl {
 	name 'test'
 	prompt "ok: ${a}"
-	params a:'a',b:'b'
+	params map
 	plist 1, 2, 5
+	result {
+		it > 0
+	}
 }
 
 println "${res} , a = ${a}"
