@@ -16,7 +16,7 @@
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<compiler.version>3.5.1</compiler.version>
-		<lang.level>1.7</lang.level>
+		<lang.level>1.8</lang.level>
 	</properties>
 
 	<dependencies>
