@@ -5,10 +5,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,6 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 
 public class TestStream {
+
 	@Test
 	public void testFibonacci() {
 		Stream<int[]> iterate;
@@ -154,13 +152,33 @@ public class TestStream {
 			new Employee("Jack", 7000),
 			new Employee("Bill", 3000));
 
-		Map<String, Employee> map = list.stream()
+		Map<String, Employee> name2employee = list.stream()
 			.collect(Collectors.toMap(Employee::getName, Function.identity(), (curV, newV) -> newV));
 
-		assertEquals(3, map.size());
-		assertEquals(7000, map.get("Jack").getSalary().intValue());
+		assertEquals(3, name2employee.size());
+		assertEquals(7000, name2employee.get("Jack").getSalary().intValue());
 
 
+		final Map<String, List<Employee>> name2employees = list.stream()
+			.collect(Collectors.groupingBy(Employee::getName, LinkedHashMap::new, Collectors.toList()));
+
+		assertEquals("John", name2employees.keySet().stream().findFirst().get());
+		assertEquals(3, name2employees.size());
+		assertEquals(1, name2employees.get("Bill").size());
+		assertEquals(2, name2employees.get("Jack").size());
+
+
+		final int averageSalary = (int) list.stream()
+			.mapToInt(Employee::getSalary)
+			.average()
+			.getAsDouble();
+		assertEquals(5250, averageSalary);
+
+		final Map<Boolean, List<Employee>> highSalaryEmployees = list.stream()
+			.collect(Collectors.partitioningBy(emp -> emp.getSalary() > averageSalary));
+
+		assertEquals(2, highSalaryEmployees.get(true).size());
+		assertEquals(2, highSalaryEmployees.get(false).size());
 	}
 
 	// ------------------------------
