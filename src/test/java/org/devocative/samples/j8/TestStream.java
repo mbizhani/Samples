@@ -38,6 +38,29 @@ public class TestStream {
 	}
 
 	@Test
+	public void test() {
+		OptionalInt max = new Random()
+			.ints()
+			.peek(value -> System.out.println("p1 - " + value))
+			.map(n -> n % 100)
+			.peek(value -> System.out.println("p2 - " + value))
+			.limit(5)
+			.peek(value -> System.out.println("p3 - " + value))
+			.max();
+		System.out.println("------ max.getAsInt() = " + max.getAsInt());
+
+		max = new Random()
+			.ints()
+			.peek(value -> System.out.println("p1 - " + value))
+			.limit(5)
+			.peek(value -> System.out.println("p2 - " + value))
+			.map(n -> n % 100)
+			.peek(value -> System.out.println("p3 - " + value))
+			.max();
+		System.out.println("------ max.getAsInt() = " + max.getAsInt());
+	}
+
+	@Test
 	public void test_Files_FlatMap_Distinct_Sorted_Reduction() throws IOException {
 		final String content = "test01 passed\ntest02 passed\ntest11 failed";
 		final String grepped = "test01 passed\ntest11 failed";
