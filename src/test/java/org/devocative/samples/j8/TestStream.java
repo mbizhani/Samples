@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
@@ -25,7 +26,7 @@ public class TestStream {
 			.peek(n -> System.out.printf("Debug: %s \n", Arrays.toString(n)))
 			.limit(5)
 			.reduce((a, b) -> b)
-			.get()[1];
+			.orElse(new int[]{0, 0})[1];
 		assertEquals(8, nth);
 
 		iterate = Stream.iterate(new int[]{1, 1}, n -> new int[]{n[1], n[0] + n[1]});
@@ -47,7 +48,7 @@ public class TestStream {
 			.limit(5)
 			.peek(value -> System.out.println("p3 - " + value))
 			.max();
-		System.out.println("------ max.getAsInt() = " + max.getAsInt());
+		System.out.println("------ max.getAsInt() = " + max.orElse(0));
 
 		max = new Random()
 			.ints()
@@ -57,7 +58,7 @@ public class TestStream {
 			.map(n -> n % 100)
 			.peek(value -> System.out.println("p3 - " + value))
 			.max();
-		System.out.println("------ max.getAsInt() = " + max.getAsInt());
+		System.out.println("------ max.getAsInt() = " + max.orElse(0));
 	}
 
 	@Test
@@ -155,7 +156,7 @@ public class TestStream {
 			//.range(1, 5)        [1, 5)
 			.rangeClosed(1, 5) // [1, 5]
 			.reduce((left, right) -> left * right)
-			.getAsLong();
+			.orElse(0);
 
 		assertEquals(120, result);
 
@@ -165,6 +166,30 @@ public class TestStream {
 			.reduce(1, (left, right) -> left * right);
 
 		assertEquals(120, result);
+	}
+
+	@Test
+	public void testNumberStream() {
+		List<Integer> integers = DoubleStream
+			.generate(Math::random)        // generate unlimited by calling Math.random
+			.mapToInt(d -> (int) (d * 10)) // convert to IntStream
+			.limit(10)                     // limit to first 10 elements
+			.boxed()                       // convert to Stream<Integer>
+			.collect(Collectors.toList()); // collect to a list
+
+		assertEquals(10, integers.size());
+
+
+		StringBuilder password = DoubleStream
+			.generate(Math::random)
+			.mapToInt(d -> (int) (d * 1000))
+			.filter(value -> (value >= 'A' && value <= 'Z') ||
+				(value >= 'a' && value <= 'z') ||
+				(value >= '0' && value <= '9'))
+			.limit(10)
+			.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append);
+
+		assertEquals(10, password.toString().length());
 	}
 
 	@Test
@@ -194,7 +219,7 @@ public class TestStream {
 		final int averageSalary = (int) list.stream()
 			.mapToInt(Employee::getSalary)
 			.average()
-			.getAsDouble();
+			.orElse(0);
 		assertEquals(5250, averageSalary);
 
 		final Map<Boolean, List<Employee>> highSalaryEmployees = list.stream()
